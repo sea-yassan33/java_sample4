@@ -6,11 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.example.sample4app.repositories.PersonRepository;
 
@@ -52,6 +49,23 @@ public class MemoController {
   @Transactional
   public ModelAndView update(@ModelAttribute Person Person, ModelAndView mav){
     repository.saveAndFlush(Person);
+    return new ModelAndView("redirect:/");
+  }
+
+  @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
+  public ModelAndView delete(@PathVariable int id, ModelAndView mav){
+    mav.setViewName("delete");
+    mav.addObject("title", "Delte page");
+    mav.addObject("msg","Can I delete this record?");
+    Optional<Person> data = repository.findById((long)id);
+    mav.addObject("formModel", data.get());
+    return mav;
+  }
+
+  @RequestMapping(value = "/delete", method = RequestMethod.POST)
+  @Transactional
+  public ModelAndView remove(@RequestParam long id, ModelAndView mav){
+    repository.deleteById(id);
     return new ModelAndView("redirect:/");
   }
 }
